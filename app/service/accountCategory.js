@@ -3,9 +3,13 @@
 const Service = require('egg').Service;
 
 class AccountCategoryService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.accountCategoryModel = ctx.model.AccountCategory;
+  }
+
   async getList(where = {}) {
-    const { app } = this;
-    const list = await app.model.AccountCategory.findAll({
+    const list = await this.accountCategoryModel.findAll({
       where,
     });
     return list;
@@ -15,16 +19,15 @@ class AccountCategoryService extends Service {
   }
 
   async update(data = {}) {
-    const { app } = this;
     const id = data.id;
     let accountCategory = {};
     if (id) {
-      accountCategory = await app.model.AccountCategory.findById(id);
+      accountCategory = await this.accountCategoryModel.findById(id);
       accountCategory.name = data.name;
       accountCategory.status = data.status;
-      accountCategory.save();
+      await accountCategory.save();
     } else {
-      accountCategory = await app.model.AccountCategory.create(data);
+      accountCategory = await this.accountCategoryModel.create(data);
     }
     return accountCategory;
   }

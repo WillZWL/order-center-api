@@ -3,12 +3,17 @@
 const Controller = require('egg').Controller;
 
 class MemberController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.memberService = ctx.service.member;
+  }
+
   async index() {
     const { ctx } = this;
     let list = [];
     const type = ctx.queries.type;
     let where = {};
-    console.log(type);
+
     if (Array.isArray(type)) {
       where = {
         type: { $in: type },
@@ -19,7 +24,7 @@ class MemberController extends Controller {
       };
 
     }
-    list = await ctx.service.member.getList(where);
+    list = await this.memberService.getList(where);
     ctx.body = {
       status: 0,
       data: list,
@@ -33,7 +38,7 @@ class MemberController extends Controller {
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const member = await ctx.service.member.update(data);
+    const member = await this.memberService.update(data);
     if (member) {
       ctx.body = member;
     } else {

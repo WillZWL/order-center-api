@@ -3,25 +3,30 @@
 const Service = require('egg').Service;
 
 class PurchaseOrderService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.purchaseOrderModel = ctx.model.PurchaseOrder;
+    this.productModel = ctx.model.Product;
+    this.attributeValueModel = ctx.model.AttributeValue;
+  }
+
   async getList() {
-    const { app } = this;
-    const list = await app.model.PurchaseOrder.findAll();
+    const list = await this.purchaseOrderModel.findAll();
     return list;
   }
 
   async get() {
-
   }
 
   async update(data = {}) {
-    const { app, ctx } = this;
+    const { ctx } = this;
     const id = data.id;
     const productId = data.product_id;
     const stockList = data.stock_list;
     const type = data.type ? data.type: 1;
     let purchaseOrder = false;
     if (id) {
-      purchaseOrder = await app.model.PurchaseOrder.findById(id);
+      purchaseOrder = await this.purchaseOrderModel.findById(id);
       purchaseOrder.ss_quantity = data.ss_quantity;
       purchaseOrder.s_quantity = data.s_quantity;
       purchaseOrder.m_quantity = data.m_quantity;
@@ -35,12 +40,12 @@ class PurchaseOrderService extends Service {
       purchaseOrder.status = data.status;
       await purchaseOrder.save();
     } else {
-      const product = await app.model.Product.findById(productId);
+      const product = await this.productModel.findById(productId);
       const base = {
         
       };
       const productColor = product.color.split(',');
-      const colorList = await app.model.AttributeValue.findAll({
+      const colorList = await this.attributeValueModel.findAll({
         where: {
           attribute_id: 1,
           value: { $in: productColor },
@@ -74,7 +79,7 @@ class PurchaseOrderService extends Service {
         }
         poList.push(po);
       });
-      await app.model.PurchaseOrder.bulkCreate(poList);
+      await this.purchaseOrderModel.bulkCreate(poList);
     }
     return purchaseOrder;
   }

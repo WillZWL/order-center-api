@@ -3,10 +3,15 @@
 const Controller = require('egg').Controller;
 
 class CategoryController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.categoryService = ctx.service.category;
+  }
+
   async index() {
     const { ctx } = this;
     let list = [];
-    list = await ctx.service.category.getList();
+    list = await this.categoryService.getList();
     ctx.body = {
       status: 0,
       data: list,
@@ -20,7 +25,7 @@ class CategoryController extends Controller {
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const category = await ctx.service.category.update(data);
+    const category = await this.categoryService.update(data);
     if (category) {
       ctx.body = category;
     } else {

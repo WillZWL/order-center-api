@@ -3,24 +3,28 @@
 const Service = require('egg').Service;
 
 class ProductService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.productModel = ctx.model.Product;
+    this.categoryModel = ctx.model.Category;
+    this.memberModel = ctx.model.Member;
+  }
   async getList() {
-    const { app } = this;
-    const list = await app.model.Product.findAll();
+    const list = await this.productModel.findAll();
     return list;
   }
 
   async get() {
-
   }
 
   async update(data) {
     const { app } = this;
     const id = data.id;
-    let product = false;
-    const category = await app.model.Category.findById(data.cate_id);
-    const supplier = await app.model.Member.findById(data.supplier_id);
+    let product = {};
+    const category = await this.categoryModel.findById(data.cate_id);
+    const supplier = await this.memberModel.findById(data.supplier_id);
     if (id) {
-      product = await app.model.Product.findById(id);
+      product = await this.productModel.findById(id);
       product.name = data.name;
       product.code = data.code;
       product.cate_id = data.cate_id;
@@ -40,7 +44,7 @@ class ProductService extends Service {
       data.color = JSON.stringify(data.color);
       data.size = JSON.stringify(data.size);
       data.supplier_name = supplier.name;
-      product = await app.model.Product.create(data);
+      product = await this.productModel.create(data);
     }
     return product;
   }

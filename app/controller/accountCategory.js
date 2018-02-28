@@ -3,13 +3,18 @@
 const Controller = require('egg').Controller;
 
 class AccountCategoryController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.accountCategoryService = ctx.service.accountCategory;
+  }
+
   async index() {
     const { ctx } = this;
     const type = ctx.query.type;
     const where = {
       type,
     };
-    const list = await ctx.service.accountCategory.getList(where);
+    const list = await this.accountCategoryService.getList(where);
     ctx.body = {
       status: 0,
       data: list,
@@ -19,13 +24,13 @@ class AccountCategoryController extends Controller {
   async get() {
     const { ctx } = this;
     const id = ctx.query.id;
-    ctx.body = await ctx.service.accountCategory.get({ id });
+    ctx.body = await this.accountCategoryService.get({ id });
   }
 
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    ctx.body = await ctx.service.accountCategory.update(data);
+    ctx.body = await this.accountCategoryService.update(data);
   }
 }
 

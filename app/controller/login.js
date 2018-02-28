@@ -3,13 +3,16 @@
 const Controller = require('egg').Controller;
 
 class LoginController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+  }
+
   async index() {
     const { ctx, app } = this;
-    const name = ctx.request.body.userName;
-    const password = ctx.request.body.password;
+    const { userName, password } =  ctx.request.body;
     const user = await app.model.User.findOne({
       where: {
-        name,
+        name: userName,
       },
     });
     if (user) {

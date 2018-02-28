@@ -3,43 +3,57 @@
 const Service = require('egg').Service;
 
 class OrderService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.orderModel = ctx.model.Order;
+    this.orderItemModel = ctx.model.OrderItem;
+    this.orderAttachmentModel = ctx.model.OrderAttachment;
+    this.receiptModel = ctx.model.Receipt; 
+    this.orderPrintModel = ctx.model.OrderPrint;
+    this.memberModel = ctx.model.Member;
+    this.accountModel = ctx.model.Account;
+    this.channelModel = ctx.model.Channel;
+
+    this.userService = ctx.service.user;
+    this.memberService = ctx.service.member;
+    this.orderItemService = ctx.service.orderItem;
+    this.receiptService = ctx.service.receipt;
+    this.orderAttachmentService = ctx.service.orderAttachment;
+  }
   async getList(where = {}) {
-    const { app } = this;
-    const list = await app.model.Order.findAll({
+    const list = await this.orderModel.findAll({
       where,
     });
     return list;
   }
 
   async getDetail(where = {}) {
-    const { app } = this;
-    const order = await app.model.Order.findOne({
+    const order = await this.orderModel.findOne({
       where,
     });
-    const orderItem = await app.model.OrderItem.findAll({
+    const orderItem = await this.orderItemModel.findAll({
       where: {
         order_id: order.id,
       }
     });
-    const orderAttachment = await app.model.OrderAttachment.findAll({
+    const orderAttachment = await this.orderAttachmentModel.findAll({
       where: {
         order_id: order.id,
       }
     });
-    const orderReceipt = await app.model.Receipt.findAll({
+    const orderReceipt = await this.receiptModel.findAll({
       where: {
         order_id: order.id,
       }
     });
     let orderPrint = [];
     if (order.status === 4) {
-      orderPrint = await app.model.OrderPrint.findAll({
+      orderPrint = await this.orderPrintModel.findAll({
         where: {
           order_id: order.id,
         }
       });
     }
-    // console.log(await order.orderItem);
     return {
       order,
       orderItem,
@@ -51,15 +65,12 @@ class OrderService extends Service {
 
   async update(data = {}) {
     const { ctx } = this;
-    const orderBaseData = data.orderData;
-    const orderItemData = data.orderItemData;
-    const receiptData = data.orderReceiptData;
-
+    const { orderData, orderItemData, orderReceiptData } = data;
     try {
-      const order = await this.createOrder(orderBaseData);
-      const orderItem = await ctx.service.orderItem.createOrderItem(order, orderItemData);
-      await this.createOrderAttachment(order, orderBaseData);
-      await this.createOrderReceipt(order, receiptData);
+      const order = await this.createOrder(orderData);
+      const orderItem = await this.orderItemService.createOrderItem(order, orderItemData);
+      await this.createOrderAttachment(order, orderData);
+      await this.createOrderReceipt(order, orderReceiptData);
       return order;
     } catch (error) {
       throw new Error(error);
@@ -67,7 +78,6 @@ class OrderService extends Service {
   }
 
   async createOrderAttachment(order = {}, orderBaseData = {}) {
-    const { ctx, app } = this;
     const attachments = [];
     if (orderBaseData.printImgs.length > 0) {
       orderBaseData.printImgs.forEach(item => {
@@ -92,30 +102,27 @@ class OrderService extends Service {
       });
     }
     if (attachments.length > 0) {
-      await ctx.service.orderAttachment.createOrderAttachment(attachments);
+      await this.orderAttachmentService.createOrderAttachment(attachments);
     }
   }
 
   async createOrderReceipt(order = {}, receiptData = {}) {
-    const { ctx } = this;
-
     if (order.invoice_type > 0) {
       receiptData.order_id = order.id;
       receiptData.order_sn = order.order_sn;
       receiptData.creator = order.creator;
-      const receipt = await ctx.service.receipt.createReceipt(receiptData);
+      const receipt = await this.receiptService.createReceipt(receiptData);
       return receipt;
     }
   }
 
   async createOrder(data = {}) {
-    const { ctx, app } = this;
     const orderSn = await this.generateOrderSn();
-    const user = await ctx.service.user.get(data.user_id);
-    const client = await ctx.service.member.get(data.client_id);
-    const delivery = await ctx.service.member.get(data.delivery_company_id);
-    const account = await app.model.Account.findById(data.account_id);
-    const channel = await app.model.Channel.findById(data.channel_id);
+    const user = await this.userService.get(data.user_id);
+    const client = await this.memberService.get(data.client_id);
+    const delivery = await this.memberService.get(data.delivery_company_id);
+    const account = await this.accountModel.findById(data.account_id);
+    const channel = await this.channelModel.findById(data.channel_id);
     const orderData = {
       order_sn: orderSn,
       user_id: data.user_id,
@@ -138,8 +145,7 @@ class OrderService extends Service {
       remark: data.remark,
       status: 2,
     };
-    const order = await app.model.Order.create(orderData);
-
+    const order = await this.orderModel.create(orderData);
     return order;
   }
 
@@ -150,20 +156,15 @@ class OrderService extends Service {
   }
 
   async updateStatus(data = {}) {
-    const { app } = this;
     const id = data.id;
-    const order = await app.model.Order.findById(id);
+    const order = await this.orderModel.findById(id);
     order.status = data.status;
     await order.save();
     return order;
   }
 
   async orderPrint(data = {}) {
-    const { app } = this;
-
-    const order_id = data.order_id;
-    const order_sn = data.order_sn;
-
+    const { order_id, order_sn } = data;
     const printshops = data.orderPrintData.printshop;
     const printCosts = data.orderPrintData.printshopCost;
 
@@ -173,8 +174,7 @@ class OrderService extends Service {
       for (const key in printshops) {
         if (printshops[key]) {
           const printshop_id = printshops[key];
-          const shop = await app.model.Member.findById(printshop_id); 
-          console.log(printCosts[key]);
+          const shop = await this.memberModel.findById(printshop_id); 
           const orderPrint = {
             order_id,
             order_sn,
@@ -186,14 +186,13 @@ class OrderService extends Service {
           orderPrints.push(orderPrint);
         }
       }
-      await app.model.OrderPrint.bulkCreate(orderPrints);
+      await this.orderPrintModel.bulkCreate(orderPrints);
 
-      order = await app.model.Order.findById(order_id);
+      order = await this.orderModel.findById(order_id);
       order.status = 4;
       await order.save();
     }
     return order;
   }
 }
-
 module.exports = OrderService;

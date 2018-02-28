@@ -3,28 +3,30 @@
 const Service = require('egg').Service;
 
 class AccountService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.accountModel = ctx.model.Account;
+  }
+
   async getList(where = {}) {
-    const { app } = this;
-    const list = await app.model.Account.findAll({
+    const list = await this.accountModel.findAll({
       where,
     });
     return list;
   }
 
   async get(where = {}) {
-    const { app } = this;
-    const account = await app.model.findOne({
+    const account = await this.accountModel.findOne({
       where,
     });
     return account;
   }
 
   async update(data = {}) {
-    const { app } = this;
     const id = data.id;
     let account = {};
     if (id) {
-      account = await app.model.Account.findById(id);
+      account = await this.accountModel.findById(id);
       account.category = data.category;
       account.category_name = data.category_name;      
       account.subject = data.subject;
@@ -33,7 +35,7 @@ class AccountService extends Service {
       account.remark = data.remark;
       await account.save();
     } else {
-      account = await app.model.Account.create(data);
+      account = await this.accountModel.create(data);
     }
     return account;
   }

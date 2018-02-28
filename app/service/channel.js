@@ -3,9 +3,13 @@
 const Service = require('egg').Service;
 
 class ChannelService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.channelModel = ctx.model.Channel;
+  }
+
   async getList(where = {}) { 
-    const { app } = this;
-    const list = await app.model.Channel.findAll({
+    const list = await this.channelModel.findAll({
       where,
     });
     return list;
@@ -15,16 +19,15 @@ class ChannelService extends Service {
   }
 
   async update(data) {
-    const { app } = this;
     const id = data.id;
     let channel = false;
     if (id) {
-      channel = await app.model.Channel.findById(id);
+      channel = await this.channelModel.findById(id);
       channel.name = data.name;
       channel.status = data.status;
       await channel.save();
     } else {
-      channel = await app.model.Channel.create(data);
+      channel = await this.channelModel.create(data);
     }
     return channel;
   }

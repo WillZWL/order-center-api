@@ -3,17 +3,20 @@
 const Service = require('egg').Service;
 
 class UserService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.userModel = ctx.model.User;
+  }
+
   async getList(where = {}) {
-    const { app } = this;
-    const list = await app.model.User.findAll({
+    const list = await this.userModel.findAll({
       where,
     });
     return list;
   }
 
   async get(id) {
-    const { app } = this;
-    return await app.model.User.findOne({
+    return await this.userModel.findOne({
       where: {
         id,
       },
@@ -22,11 +25,10 @@ class UserService extends Service {
   }
 
   async update(data = {}) {
-    const { app } = this;
     const id = data.id;
-    let user = false;
+    let user = {};
     if (id) {
-      user = await app.model.User.findOne({
+      user = await this.userModel.findOne({
         where: {
           id,
         },
@@ -36,22 +38,21 @@ class UserService extends Service {
       user.mobilephone = data.mobilephone;
       user.depart = data.depart;
       user.status = data.status;
-      user.save();
+      await user.save();
     } else {
       const roles = JSON.stringify(data.roles);
       data.depart = roles;
-      user = await app.model.User.create(data);
+      user = await this.userModel.create(data);
     }
     return user;
   }
 
   async updatePassword(data = {}) {
     const { app, ctx } = this;
-    const oldPass = data.oldPass;
-    const newPass = data.newPass;
-    const id = data.id;
+    const { id, oldPass, oldPass } = data;
+
     if (id) {
-      const user = await app.model.User.findById(id);
+      const user = await this.userModel.findById(id);
       const md5Oldpwd = ctx.helper.md5(oldPass + app.config.keys);
       if (user.password === md5Oldpwd) {
         const md5NewPwd = ctx.helper.md5(newPass + app.config.keys);
@@ -70,17 +71,15 @@ class UserService extends Service {
   }
 
   async userRole(data = {}) {
-    const { app } = this;
     const id = data.id;
     const roles = JSON.stringify(data.roles);
     let user = {};
     if (id) {
-      user = await app.model.User.findById(id);
+      user = await this.userModel.findById(id);
       user.depart = roles;
       user.save();
     }
     return user;
   }
 }
-
 module.exports = UserService;

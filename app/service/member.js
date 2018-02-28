@@ -3,17 +3,20 @@
 const Service = require('egg').Service;
 
 class MemberService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.memberModel = ctx.model.Member;
+  }
+
   async getList(where = {}) {
-    const { app } = this;
-    const list = await app.model.Member.findAll({
+    const list = await this.memberModel.findAll({
       where,
     });
     return list;
   }
 
   async get(id) {
-    const { app } = this;
-    return await app.model.Member.findOne({
+    return await this.memberModel.findOne({
       where: {
         id,
       },
@@ -21,11 +24,10 @@ class MemberService extends Service {
   }
 
   async update(data = {}) {
-    const { app } = this;
     const id = data.id;
-    let member = false;
+    let member = {};
     if (id) {
-      member = await app.model.Member.findOne({
+      member = await this.memberModel.findOne({
         where: {
           id,
         },
@@ -40,9 +42,9 @@ class MemberService extends Service {
       member.address = data.address;
       member.remark = data.remark;
       member.status = data.status;
-      member.save();
+      await member.save();
     } else {
-      member = await app.model.Member.create(data);
+      member = await this.memberModel.create(data);
     }
     return member;
   }

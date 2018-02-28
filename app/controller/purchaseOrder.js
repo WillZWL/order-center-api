@@ -3,14 +3,18 @@
 const Controller = require('egg').Controller;
 
 class PurchaseOrderController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.purchaseOrderService = ctx.service.purchaseOrder;
+  }
   async index() {
     const { ctx } = this;
     let list = [];
-    const type = ctx.query.type;
+    const { type } = ctx.query;
     const where = {
       type,
     };
-    list = await ctx.service.purchaseOrder.getList(where);
+    list = await this.purchaseOrderService.getList(where);
     ctx.body = {
       status: 0,
       data: list,
@@ -24,7 +28,7 @@ class PurchaseOrderController extends Controller {
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const purchaseOrder = await ctx.service.purchaseOrder.update(data);
+    const purchaseOrder = await this.purchaseOrderService.update(data);
     if (purchaseOrder) {
       ctx.body = purchaseOrder;
     } else {

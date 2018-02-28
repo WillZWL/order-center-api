@@ -3,10 +3,15 @@
 const Controller = require('egg').Controller;
 
 class AttributeController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.attributeService = ctx.service.attribute;
+  }
+
   async index() {
     const { ctx } = this;
     let list = [];
-    list = await ctx.service.attribute.getList();
+    list = await this.attributeService.getList();
     ctx.body = {
       status: 0,
       data: list,
@@ -20,7 +25,7 @@ class AttributeController extends Controller {
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const attribute = await ctx.service.attribute.update(data);
+    const attribute = await this.attributeService.update(data);
     if (attribute) {
       ctx.body = attribute;
     } else {

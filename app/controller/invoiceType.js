@@ -3,10 +3,15 @@
 const Controller = require('egg').Controller;
 
 class InvoiceTypeController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.invoiceTypeService = ctx.service.invoiceType;
+  }
+
   async index() {
     const { ctx } = this;
     let list = [];
-    list = await ctx.service.invoiceType.getList();
+    list = await this.invoiceTypeService.getList();
     ctx.body = {
       status: 0,
       data: list,
@@ -20,7 +25,7 @@ class InvoiceTypeController extends Controller {
   async update() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const invoiceType = await ctx.service.invoiceType.update(data);
+    const invoiceType = await this.invoiceTypeService.update(data);
     if (invoiceType) {
       ctx.body = invoiceType;
     } else {

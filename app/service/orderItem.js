@@ -3,6 +3,11 @@
 const Service = require('egg').Service;
 
 class OrderItemService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.orderItemModel = ctx.model.OrderItem;
+  }
+
   async createOrderItem(order = {}, itemData = []) {
     const { app } = this;
     const orderItems = [];
@@ -26,11 +31,9 @@ class OrderItemService extends Service {
         total_quantity: item.total,
         amount: item.amount,
       };
-
       orderItems.push(orderItem);
     });
-
-    await app.model.OrderItem.bulkCreate(orderItems);
+    await this.orderItemModel.bulkCreate(orderItems);
   }
 }
 

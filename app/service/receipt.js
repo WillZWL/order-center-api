@@ -3,9 +3,13 @@
 const Service = require('egg').Service;
 
 class ReceiptService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.receiptModel = ctx.model.Receipt;
+  }
+
   async createReceipt(data = {}) {
-    const { app } = this;
-    const receipt = await app.model.Receipt.create(data);
+    const receipt = await this.receiptModel.create(data);
     return receipt;
   } 
 }

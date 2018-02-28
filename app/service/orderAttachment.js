@@ -3,9 +3,13 @@
 const Service = require('egg').Service;
 
 class OrderAttachmentService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.orderAttachmentModel = ctx.model.OrderAttachment;
+  }
+
   async createOrderAttachment(attachments = []) {
-    const { app } = this;
-    await app.model.OrderAttachment.bulkCreate(attachments);
+    await this.orderAttachmentModel.bulkCreate(attachments);
   }
 }
 

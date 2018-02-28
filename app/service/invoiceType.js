@@ -3,25 +3,28 @@
 const Service = require('egg').Service;
 
 class InvoiceTypeService extends Service {
+  constructor(ctx) {
+    super(ctx);
+    this.invoiceTypeModel = ctx.model.InvoiceType;
+  }
+
   async getList(where = {}) { 
-    const { app } = this;
-    const list = await app.model.InvoiceType.findAll({
+    const list = await InvoiceType.findAll({
       where,
     });
     return list;
   }
 
   async update(data) {
-    const { app } = this;
     const id = data.id;
-    let invoiceType = false;
+    let invoiceType = {};
     if (id) {
-      invoiceType = await app.model.InvoiceType.findById(id);
+      invoiceType = await InvoiceType.findById(id);
       invoiceType.name = data.name;
       invoiceType.status = data.status;
       await invoiceType.save();
     } else {
-      invoiceType = await app.model.InvoiceType.create(data);
+      invoiceType = await InvoiceType.create(data);
     }
     return invoiceType;
   }

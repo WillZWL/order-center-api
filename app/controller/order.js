@@ -7,13 +7,18 @@ const sendToWormhole = require('stream-wormhole');
 const Controller = require('egg').Controller;
 
 class OrderController extends Controller {
+  constructor(ctx) {
+    super(ctx);
+    this.orderService = ctx.service.order;
+  }
+
   async index() {
     const { ctx } = this;
     const status = ctx.query.status;
     const where = {
       status,
     };
-    const list = await ctx.service.order.getList(where);
+    const list = await this.orderService.getList(where);
     ctx.body = {
       status: 0,
       data: list,
@@ -26,7 +31,7 @@ class OrderController extends Controller {
     const where = {
       id
     };
-    const order = await ctx.service.order.getDetail(where);
+    const order = await this.orderService.getDetail(where);
     ctx.body = {
       status: 0,
       data: order,
@@ -36,7 +41,7 @@ class OrderController extends Controller {
   async create() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const order = await ctx.service.order.update(data);
+    const order = await this.orderService.update(data);
     if (order) {
       ctx.body = {
         order,
@@ -49,7 +54,7 @@ class OrderController extends Controller {
   async updateStatus() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const order = await ctx.service.order.updateStatus(data);
+    const order = await this.orderService.updateStatus(data);
     ctx.body = {
       order,
     }
@@ -58,7 +63,7 @@ class OrderController extends Controller {
   async orderPrint() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const order = await ctx.service.order.orderPrint(data);
+    const order = await this.orderService.orderPrint(data);
     ctx.body = {
       status: 0,
       order
