@@ -8,8 +8,10 @@ class ProductInventoryService extends Service {
     this.productInventoryModel = ctx.model.ProductInventory;
   }
 
-  async getList(where = {}) {
-    const list = await this.productInventoryModel.findAll({ where });
+  async getList(where = {}, option = {}) {
+    const list = await this.productInventoryModel.findAndCountAll({ 
+      where 
+    });
     return list;
   }
 

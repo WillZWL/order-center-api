@@ -8,8 +8,13 @@ class ReceiptService extends Service {
     this.receiptModel = ctx.model.Receipt;
   }
 
-  async createReceipt(data = {}) {
-    const receipt = await this.receiptModel.create(data);
+  async createOrderReceipt(order = {}, receiptData = {}) {
+    if (order.invoice_type > 0) {
+      receiptData.order_id = order.id;
+      receiptData.order_sn = order.order_sn;
+      receiptData.creator = order.creator;
+    }
+    const receipt = await this.receiptModel.create(receiptData);
     return receipt;
   } 
 }

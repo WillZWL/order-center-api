@@ -11,17 +11,13 @@ class ProductInventoryController extends Controller {
   async index() {
     const { ctx } = this;
     let list = [];
-    const { name, cate_id, code } = ctx.query;
-
+    const { name, code } = ctx.query;
     let where = {};
     if (name) {
-        where.product_name = name;
-    }
-    if (cate_id) {
-        where.cate_id = cate_id;
+      where.product_name = { $like: `%${name}%` };
     }
     if (code) {
-        where.code = code;
+      where.code = code;
     }
     list = await this.productInventoryService.getList(where);
     ctx.body = {

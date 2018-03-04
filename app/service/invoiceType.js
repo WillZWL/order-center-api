@@ -9,7 +9,7 @@ class InvoiceTypeService extends Service {
   }
 
   async getList(where = {}) { 
-    const list = await InvoiceType.findAll({
+    const list = await this.invoiceTypeModel.findAll({
       where,
     });
     return list;
@@ -19,12 +19,12 @@ class InvoiceTypeService extends Service {
     const id = data.id;
     let invoiceType = {};
     if (id) {
-      invoiceType = await InvoiceType.findById(id);
+      invoiceType = await this.invoiceTypeModel.findById(id);
       invoiceType.name = data.name;
       invoiceType.status = data.status;
       await invoiceType.save();
     } else {
-      invoiceType = await InvoiceType.create(data);
+      invoiceType = await this.invoiceTypeModel.create(data);
     }
     return invoiceType;
   }

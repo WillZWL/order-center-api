@@ -11,7 +11,16 @@ class ProductController extends Controller {
   async index() {
     const { ctx } = this;
     let list = [];
-    list = await this.productService.getList();
+    const { name, code } = ctx.query;
+    const where = {};
+    if (name) {
+      where.name = { $like: `%${name}%` };
+    }
+    if (code) {
+      where.code = code;
+    }
+
+    list = await this.productService.getList(where);
     ctx.body = {
       status: 0,
       data: list,

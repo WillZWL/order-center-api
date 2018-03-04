@@ -19,10 +19,14 @@ class OrderService extends Service {
     this.orderItemService = ctx.service.orderItem;
     this.receiptService = ctx.service.receipt;
     this.orderAttachmentService = ctx.service.orderAttachment;
+    this.orderAddressService = ctx.service.orderAddress;
   }
-  async getList(where = {}) {
-    const list = await this.orderModel.findAll({
+  async getList(where = {}, option = {}) {
+    const list = await this.orderModel.findAndCountAll({
       where,
+      order: option.order,
+      offset: option.offset,
+      limit: option.limit,
     });
     return list;
   }
@@ -64,55 +68,20 @@ class OrderService extends Service {
   }
 
   async update(data = {}) {
-    const { ctx } = this;
+    const { ctx, app } = this;
     const { orderData, orderItemData, orderReceiptData } = data;
+    const trans = await app.model.transaction();
     try {
       const order = await this.createOrder(orderData);
       const orderItem = await this.orderItemService.createOrderItem(order, orderItemData);
-      await this.createOrderAttachment(order, orderData);
-      await this.createOrderReceipt(order, orderReceiptData);
+      await this.orderAttachmentService.createOrderAttachment(order, orderData);
+      await this.receiptService.createOrderReceipt(order, orderReceiptData);
+      await this.orderAddressService.createOrderAddress(order, orderData);
+      await trans.commit();
       return order;
     } catch (error) {
+      await trans.rollback();
       throw new Error(error);
-    }
-  }
-
-  async createOrderAttachment(order = {}, orderBaseData = {}) {
-    const attachments = [];
-    if (orderBaseData.printImgs.length > 0) {
-      orderBaseData.printImgs.forEach(item => {
-        const print = {
-          type: 1,
-          order_id: order.id,
-          order_sn: order.order_sn,
-          path: item,
-        };
-        attachments.push(print);
-      });
-    }
-    if (orderBaseData.invoiceImgs.length > 0) {
-      orderBaseData.invoiceImgs.forEach(item => {
-        const invoice = {
-          type: 2,
-          order_id: order.id,
-          order_sn: order.order_sn,
-          path: item,
-        };
-        attachments.push(invoice);
-      });
-    }
-    if (attachments.length > 0) {
-      await this.orderAttachmentService.createOrderAttachment(attachments);
-    }
-  }
-
-  async createOrderReceipt(order = {}, receiptData = {}) {
-    if (order.invoice_type > 0) {
-      receiptData.order_id = order.id;
-      receiptData.order_sn = order.order_sn;
-      receiptData.creator = order.creator;
-      const receipt = await this.receiptService.createReceipt(receiptData);
-      return receipt;
     }
   }
 
@@ -128,6 +97,7 @@ class OrderService extends Service {
       user_id: data.user_id,
       creator: user.name,
       channel_id: data.channel_id,
+      channel_name: channel.name,
       order_date: data.order_date,
       client_id: data.client_id,
       client_name: client.name,

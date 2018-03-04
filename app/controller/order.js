@@ -1,4 +1,5 @@
 'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const awaitWriteStream = require('await-stream-ready').write;
@@ -14,11 +15,34 @@ class OrderController extends Controller {
 
   async index() {
     const { ctx } = this;
-    const status = ctx.query.status;
+    const perPage = 10;
+    const { status, page, order_sn, client_name, start_date, end_date } = ctx.query;
     const where = {
       status,
     };
-    const list = await this.orderService.getList(where);
+    if (order_sn) {
+      where.order_sn = order_sn;
+    }
+    if (client_name) {
+      where.client_name = { $like: `%${client_name}%` };
+    }
+    if (start_date) {
+      where.created_at = { $gte: start_date };
+    }
+    if (end_date) {
+      where.created_at = { $lte: end_date };
+    }
+    if (start_date && end_date) {
+      where.created_at = { $between: [ start_date + ' 00:00:00', end_date + ' 23:59:59' ]};
+    }
+    const option = {
+      order: [
+        ['created_at', 'DESC'],
+      ],
+      offset: (page - 1) * perPage,
+      limit: perPage,
+    }
+    const list = await this.orderService.getList(where, option);
     ctx.body = {
       status: 0,
       data: list,

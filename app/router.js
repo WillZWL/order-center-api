@@ -15,7 +15,10 @@ module.exports = app => {
   router.get('/api/products', controller.product.index);
   router.get('/api/product', controller.product.get);
   router.post('/api/product', controller.product.update);
-
+  // 产品库存
+  router.get('/api/product/inventorys', controller.productInventory.index);
+  router.get('/api/product/inventory', controller.productInventory.get);
+  
   // category
   router.get('/api/categorys', controller.category.index);
   router.get('/api/category', controller.category.get);
@@ -76,9 +79,4 @@ module.exports = app => {
   router.get('/api/purchase-orders', controller.purchaseOrder.index);
   router.get('/api/purchase-order', controller.purchaseOrder.get);
   router.post('/api/purchase-order', controller.purchaseOrder.update);
-
-  // 产品库存
-  router.get('/api/product-inventorys', controller.productInventory.index);
-  router.get('/api/product-inventory', controller.productInventory.get);
-  
 };

@@ -9,8 +9,11 @@ class ProductService extends Service {
     this.categoryModel = ctx.model.Category;
     this.memberModel = ctx.model.Member;
   }
-  async getList() {
-    const list = await this.productModel.findAll();
+
+  async getList(where = {}, option = {}) {
+    const list = await this.productModel.findAndCountAll({
+      where,
+    });
     return list;
   }
 
