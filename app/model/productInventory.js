@@ -31,5 +31,9 @@ module.exports = app => {
     },
   });
 
+  ProductInventory.associate = function() {
+    app.model.ProductInventory.belongsTo(app.model.Product, { as: 'products', foreignKey: 'product_id' });
+  }
+
   return ProductInventory;
 };

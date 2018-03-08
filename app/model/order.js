@@ -40,7 +40,7 @@ module.exports = app => {
     }
   });
 
-  Order.prototype.associate = function() {
+  Order.associate = function() {
     app.model.Order.hasMany(app.model.OrderItem, { as: 'order_item', foreignKey: 'order_id' });
     app.model.Order.hasMany(app.model.OrderAttachment, { as: 'order_attachment', foreignKey: 'order_id' });
     app.model.Order.hasOne(app.model.Receipt, { as: 'receipt', foreignKey: 'order_id' });

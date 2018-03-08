@@ -164,5 +164,12 @@ class OrderService extends Service {
     }
     return order;
   }
+
+  async orderReceipt(data = {}) {
+    const order_id = data.order_id;
+    const order = await this.orderModel.findById(order_id);
+    const receipt = await this.receiptService.createOrderReceipt(order, data);
+    return receipt;
+  }
 }
 module.exports = OrderService;

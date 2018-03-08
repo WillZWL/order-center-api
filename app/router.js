@@ -32,6 +32,7 @@ module.exports = app => {
   router.post('/api/order/invoiceUpload', controller.order.invoiceUpload);
   router.post('/api/order/updateStatus', controller.order.updateStatus);
   router.post('/api/order/orderPrint', controller.order.orderPrint);
+  router.post('/api/order/receipt', controller.order.orderReceipt);
 
   // channel
   router.get('/api/channels', controller.channel.index);

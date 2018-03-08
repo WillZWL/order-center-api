@@ -140,6 +140,19 @@ class OrderController extends Controller {
     file = '/public/' + filepath + name + ext;
     return file;
   }
+
+  async orderReceipt() {
+    const { ctx } = this;
+    const data = ctx.request.body;
+    const receipt = await this.orderService.orderReceipt(data);
+    if (receipt) {
+      ctx.body = {
+        receipt
+      }
+    } else {
+      ctx.body = {};
+    }
+  }
 }
 
 module.exports = OrderController;

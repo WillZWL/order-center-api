@@ -36,5 +36,9 @@ module.exports = app => {
     },
   });
 
+  Product.associate = function() {
+    app.model.Product.hasMany(app.model.ProductInventory, { as: 'product_inventorys', foreignKey: 'product_id' });
+  }
+
   return Product;
 };

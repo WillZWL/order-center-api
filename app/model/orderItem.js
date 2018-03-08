@@ -24,9 +24,5 @@ module.exports = app => {
     amount: INTEGER,
   });
 
-  OrderItems.prototype.associate = function() {
-    app.model.OrderItems.belongsTo(app.model.Order, { as: 'order', foreignKey: 'order_id' });
-  }
-
   return OrderItems;
 };
