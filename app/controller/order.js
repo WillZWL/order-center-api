@@ -87,10 +87,10 @@ class OrderController extends Controller {
   async orderPrint() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const order = await this.orderService.orderPrint(data);
+    const orderPrint = await this.orderService.orderPrint(data);
     ctx.body = {
       status: 0,
-      order
+      orderPrint,
     }
   }
 

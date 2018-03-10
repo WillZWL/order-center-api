@@ -13,7 +13,13 @@ module.exports = app => {
     printshop_id: INTEGER,
     printshop_name: STRING,
     printcost: INTEGER,
+    status: INTEGER,
   }, {
+    defaultScope: {
+      where: {
+        status: 1,
+      },
+    },
     getterMethods: {
         typeStr() {
           return typeArr[this.type];

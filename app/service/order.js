@@ -147,31 +147,57 @@ class OrderService extends Service {
     const printshops = data.orderPrintData.printshop;
     const printCosts = data.orderPrintData.printshopCost;
 
-    let order = [];
+    let order = {};
     if (printshops.length > 0) {
       const orderPrints = [];
       for (const key in printshops) {
-        if (printshops[key]) {
+        if (key > 0) {
           const printshop_id = printshops[key];
-          const shop = await this.memberModel.findById(printshop_id); 
-          const orderPrint = {
-            order_id,
-            order_sn,
-            type: key,
-            printshop_id,
-            printshop_name: shop.name,
-            printcost: printCosts[key],
-          };
-          orderPrints.push(orderPrint);
+          const origin = await this.orderPrintModel.findOne({
+            where: {
+              order_id,
+              type: key,
+              status: 1,
+            }
+          });
+          if (printshop_id > 0) {
+            const shop = await this.memberModel.findById(printshop_id);
+            if (origin) {
+              origin.type = key;
+              origin.printshop_id = printshop_id;
+              origin.printshop_name = shop.name;
+              origin.printcost = printCosts[key];
+              await origin.save();
+            } else {
+              const orderPrint = {
+                order_id,
+                order_sn,
+                type: key,
+                printshop_id,
+                printshop_name: shop.name,
+                printcost: printCosts[key],
+              };
+              orderPrints.push(orderPrint);
+            }
+          } else {
+            if (origin) {
+              origin.status = 0;
+              await origin.save();
+            }
+          }
         }
       }
       await this.orderPrintModel.bulkCreate(orderPrints);
-
       order = await this.orderModel.findById(order_id);
       order.status = 4;
       await order.save();
     }
-    return order;
+    const orderPrint = await this.orderPrintModel.findAll({
+      where: {
+        order_id,
+      }
+    });
+    return orderPrint;
   }
 
   async orderReceipt(data = {}) {
