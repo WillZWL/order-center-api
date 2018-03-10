@@ -15,7 +15,7 @@ class OrderController extends Controller {
 
   async index() {
     const { ctx } = this;
-    const perPage = 10;
+    const perPage = 20;
     const { status, page, order_sn, client_name, start_date, end_date } = ctx.query;
     const where = {
       status,

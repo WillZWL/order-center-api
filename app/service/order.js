@@ -23,7 +23,16 @@ class OrderService extends Service {
   }
   async getList(where = {}, option = {}) {
     const list = await this.orderModel.findAndCountAll({
+      include: [{
+        model: this.receiptModel,
+        required: false,
+        as: 'receipt',
+      }],
       where,
+      distinct: true,
+      subQuery: false,
+      row: true,
+      group: ['orders.id'],
       order: option.order,
       offset: option.offset,
       limit: option.limit,

@@ -8,11 +8,33 @@ class ProductService extends Service {
     this.productModel = ctx.model.Product;
     this.categoryModel = ctx.model.Category;
     this.memberModel = ctx.model.Member;
+    this.inventoryModel = ctx.model.ProductInventory;
   }
 
   async getList(where = {}, option = {}) {
+    const { app } = this;    
     const list = await this.productModel.findAndCountAll({
+      include: [{
+        model: this.inventoryModel,
+        required: false,
+        as: 'inventory',
+        attributes:[ 
+          [app.Sequelize.fn('SUM', app.Sequelize.col('ss_quantity')), 'ss_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('s_quantity')), 's_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('m_quantity')), 'm_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('l_quantity')), 'l_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('xl_quantity')), 'xl_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('xxl_quantity')), 'xxl_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('xxxl_quantity')), 'xxxl_quantity'],
+          [app.Sequelize.fn('SUM', app.Sequelize.col('xxxxl_quantity')), 'xxxxl_quantity'],
+        ],
+      }], 
       where,
+      distinct: true,
+      subQuery: false,
+      group: ['products.id'],
+      offset: option.offset,
+      limit: option.limit,
     });
     return list;
   }

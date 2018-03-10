@@ -10,8 +10,9 @@ class ProductController extends Controller {
 
   async index() {
     const { ctx } = this;
+    const perPage = 10;    
     let list = [];
-    const { name, code } = ctx.query;
+    const { name, code, page } = ctx.query;
     const where = {};
     if (name) {
       where.name = { $like: `%${name}%` };
@@ -19,8 +20,14 @@ class ProductController extends Controller {
     if (code) {
       where.code = code;
     }
-
-    list = await this.productService.getList(where);
+    const option = {
+      order: [
+        ['created_at', 'DESC'],
+      ],
+      offset: (page - 1) * perPage,
+      limit: perPage,
+    }
+    list = await this.productService.getList(where, option);
     ctx.body = {
       status: 0,
       data: list,
