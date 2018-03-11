@@ -79,5 +79,5 @@ module.exports = app => {
   // 进货单
   router.get('/api/purchase-orders', controller.purchaseOrder.index);
   router.get('/api/purchase-order', controller.purchaseOrder.get);
-  router.post('/api/purchase-order', controller.purchaseOrder.update);
+  router.post('/api/purchase-order', controller.purchaseOrder.create);
 };

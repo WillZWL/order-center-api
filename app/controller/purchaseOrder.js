@@ -25,10 +25,10 @@ class PurchaseOrderController extends Controller {
     this.ctx.body = 'PurchaseOrder get';
   }
 
-  async update() {
+  async create() {
     const { ctx } = this;
     const data = ctx.request.body;
-    const purchaseOrder = await this.purchaseOrderService.update(data);
+    const purchaseOrder = await this.purchaseOrderService.create(data);
     if (purchaseOrder) {
       ctx.body = purchaseOrder;
     } else {

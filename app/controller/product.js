@@ -12,7 +12,8 @@ class ProductController extends Controller {
     const { ctx } = this;
     const perPage = 10;    
     let list = [];
-    const { name, code, page } = ctx.query;
+    const { name, code } = ctx.query;
+    const page = ctx.query.page ? ctx.query.page : 1;
     const where = {};
     if (name) {
       where.name = { $like: `%${name}%` };
