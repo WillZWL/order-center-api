@@ -32,6 +32,8 @@ class MemberService extends Service {
           id,
         },
       });
+      member.category = data.category;
+      member.category_name = data.category_name;
       member.name = data.name;
       member.code = data.code;
       member.contacts_name = data.contacts_name;

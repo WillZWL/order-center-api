@@ -6,6 +6,8 @@ module.exports = app => {
   const Member = app.model.define('members', {
     id: { type: INTEGER, primaryKey: true, autoIncrement: true },
     type: INTEGER,
+    category: INTEGER,
+    category_name: STRING,
     name: STRING,
     code: STRING,
     contacts_name: STRING,
