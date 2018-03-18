@@ -64,6 +64,11 @@ module.exports = app => {
   router.get('/api/attribute-value', controller.attributeValue.get);
   router.post('/api/attribute-value', controller.attributeValue.update);
 
+  // client category
+  router.get('/api/member-categorys', controller.memberCategory.index);
+  router.get('/api/member-category', controller.memberCategory.get);
+  router.post('/api/member-category', controller.memberCategory.update);
+
   // member
   router.get('/api/members', controller.member.index);
   router.get('/api/member', controller.member.get);

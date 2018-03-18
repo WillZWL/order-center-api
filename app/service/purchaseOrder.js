@@ -12,8 +12,10 @@ class PurchaseOrderService extends Service {
     this.poItemService = ctx.service.purchaseOrderItem;    
   }
 
-  async getList() {
-    const list = await this.poModel.findAndCountAll();
+  async getList(where) {
+    const list = await this.poModel.findAndCountAll({
+      where,
+    });
     return list;
   }
 
