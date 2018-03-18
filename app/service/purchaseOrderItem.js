@@ -10,6 +10,13 @@ class PurchaseOrderItemService extends Service {
     this.poItemModel = ctx.model.PurchaseOrderItem;
   }
 
+  async getList(where = {}) {
+    const list = await this.poItemModel.findAndCountAll({
+      where,
+    });
+    return list;
+  }
+
   async create(po = {}, productId, itemList = []) {
     const { ctx } = this;    
     if (itemList.length > 0) {

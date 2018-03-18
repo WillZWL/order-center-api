@@ -80,4 +80,7 @@ module.exports = app => {
   router.get('/api/purchase-orders', controller.purchaseOrder.index);
   router.get('/api/purchase-order', controller.purchaseOrder.get);
   router.post('/api/purchase-order', controller.purchaseOrder.create);
+
+  // 进货单详情
+  router.get('/api/purchase-order-items', controller.purchaseOrderItem.index);
 };
