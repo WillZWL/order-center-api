@@ -20,6 +20,11 @@ module.exports = app => {
     status: INTEGER,
     remark: STRING,
   }, {
+    getterMethods: {
+      sys_code() {
+        return 'KH' + (this.id/Math.pow(10, 4)).toFixed(4).substr(2);
+      },
+    },
     defaultScope: {
       where: {
         status: 1,
